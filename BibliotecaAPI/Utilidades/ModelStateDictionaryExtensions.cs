@@ -1,0 +1,21 @@
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+
+namespace BibliotecaAPI.Utilidades
+{
+    public static class ModelStateDictionaryExtensions
+    {
+        public static BadRequestObjectResult ContruirProblemDetail(
+            this ModelStateDictionary modelState)
+        {
+            var problemDetails = new ValidationProblemDetails(modelState)
+            {
+                Title = "One o more validation errors occurred",
+                Status = StatusCodes.Status400BadRequest
+            };
+            return new BadRequestObjectResult(problemDetails);
+
+        }
+    }
+}
