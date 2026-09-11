@@ -1,29 +1,29 @@
 name: Hola mundo
 
 on:
-  - workflow_dispatch  # Ejecución manual
-  - push:
-      branches: 
-        - main
-      paths: 
-        - 'BibliotecaAPI/**'
-        - 'BibliotecaApiTest/**'
-        - '.github/workflows/Hola-Mundo.yml'    
-  - pull_request:
-      branches:
-        - main
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'BibliotecaAPI/**'
+      - 'BibliotecaApiTest/**'
+      - '.github/workflows/Hola-Mundo.yml'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   saludar:
-    runs-on: ubuntu-latest  # ✅ Corregido: era "ubunto"
-    steps: 
+    runs-on: ubuntu-latest
+    steps:
       - name: Muestra mensaje hola mundo
         run: echo "hola mundo Napo"
-          
+
       - name: Checkout
-        uses: actions/checkout@v2.8.0  # ✅ Corregida indentación
+        uses: actions/checkout@v4
 
       - name: Listar los archivos del repositorio
-        run: |  # ✅ Corregida indentación
+        run: |
           echo "El repositorio ${{ github.repository }} contiene los siguientes archivos:"
-          tree  # ✅ Corregida indentación
+          tree
