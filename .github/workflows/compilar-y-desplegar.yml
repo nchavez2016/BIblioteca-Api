@@ -1,0 +1,39 @@
+name: compilar y desplegar
+
+on:
+ - workflow_dispatch:
+ push:
+   branches:
+      - main
+   paths: 
+      - 'BibliotecaAPI/**'
+      - 'BibliotecaApiTest/**'
+      - '.github/workflows/compilar-y-desplegar.yml'
+env: 
+ VERSION_DOTNET: '10'
+
+job:
+  build:
+    runs-on: ubuntu-latest
+    env:
+       proyecto: BibliotecaAPI/BibliotecaAPI.csproj
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar .Nnet
+        uses: actions/setup-dotnet@v6.0.0
+        with:
+         dotnet-version:${{ VERSION_DOTNET }}
+
+      - name: Obteniendo las dependencias
+        run: dotnet restore
+      
+      - name: Compilar
+        run: dotnet build --no restore
+
+      - name: Realizar pruebas
+        run: dotnet test --no build
+        
+        
+      
