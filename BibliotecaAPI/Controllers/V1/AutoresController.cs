@@ -75,8 +75,7 @@ namespace BibliotecaAPI.Controllers.V1
             //logger.LogWarning("Obteniendo listado de autore");
             //logger.LogError("Obteniendo listado de autore");
             //logger.LogCritical("Obteniendo listado de autore");
-            //throw new NotImplementedException();--codigo para prueba de error
-            throw new ApplicationException("Linea que se debe borrar");
+            //throw new NotImplementedException();--codigo para prueba de error            
             return await servicioAutoresV1.Get(paginacionDTO);
 
         }
