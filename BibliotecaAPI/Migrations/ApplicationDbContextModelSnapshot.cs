@@ -124,6 +124,51 @@ namespace BibliotecaAPI.Migrations
                     b.ToTable("Errores");
                 });
 
+            modelBuilder.Entity("BibliotecaAPI.Entidades.Factura", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FechaEmision")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FechaLimiteDePago")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Monto")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("Pagada")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("Facturas");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.FacturaEmitida", b =>
+                {
+                    b.Property<int>("Mes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Año")
+                        .HasColumnType("int");
+
+                    b.HasKey("Mes", "Año");
+
+                    b.ToTable("FacturasEmitidas");
+                });
+
             modelBuilder.Entity("BibliotecaAPI.Entidades.Libro", b =>
                 {
                     b.Property<int>("Id")
@@ -139,6 +184,100 @@ namespace BibliotecaAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Libros");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.LlaveAPI", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activa")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Llave")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TipoLlave")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("LlavesApi");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.Peticion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("FechaPeticion")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LlaveId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LlaveId");
+
+                    b.ToTable("Peticiones");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.RestriccionDominio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Dominio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LlaveId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LlaveId");
+
+                    b.ToTable("RestriccionesDominio");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.RestriccionIP", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("IP")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LlaveId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LlaveId");
+
+                    b.ToTable("RestriccionesIP");
                 });
 
             modelBuilder.Entity("BibliotecaAPI.Entidades.Usuario", b =>
@@ -168,6 +307,9 @@ namespace BibliotecaAPI.Migrations
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
                         .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("MalaPaga")
+                        .HasColumnType("bit");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
@@ -380,6 +522,61 @@ namespace BibliotecaAPI.Migrations
                     b.Navigation("Usuario");
                 });
 
+            modelBuilder.Entity("BibliotecaAPI.Entidades.Factura", b =>
+                {
+                    b.HasOne("BibliotecaAPI.Entidades.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.LlaveAPI", b =>
+                {
+                    b.HasOne("BibliotecaAPI.Entidades.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.Peticion", b =>
+                {
+                    b.HasOne("BibliotecaAPI.Entidades.LlaveAPI", "Llave")
+                        .WithMany()
+                        .HasForeignKey("LlaveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Llave");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.RestriccionDominio", b =>
+                {
+                    b.HasOne("BibliotecaAPI.Entidades.LlaveAPI", "Llave")
+                        .WithMany("RestriccionesDominio")
+                        .HasForeignKey("LlaveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Llave");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.RestriccionIP", b =>
+                {
+                    b.HasOne("BibliotecaAPI.Entidades.LlaveAPI", "Llave")
+                        .WithMany("RestriccionesIP")
+                        .HasForeignKey("LlaveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Llave");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -441,6 +638,13 @@ namespace BibliotecaAPI.Migrations
                     b.Navigation("Autores");
 
                     b.Navigation("Comentarios");
+                });
+
+            modelBuilder.Entity("BibliotecaAPI.Entidades.LlaveAPI", b =>
+                {
+                    b.Navigation("RestriccionesDominio");
+
+                    b.Navigation("RestriccionesIP");
                 });
 #pragma warning restore 612, 618
         }

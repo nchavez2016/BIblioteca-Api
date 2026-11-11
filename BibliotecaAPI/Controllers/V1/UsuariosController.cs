@@ -3,6 +3,7 @@ using BibliotecaAPI.Datos;
 using BibliotecaAPI.DTOs;
 using BibliotecaAPI.Entidades;
 using BibliotecaAPI.Servicios;
+using BibliotecaAPI.Utilidades;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +17,16 @@ namespace BibliotecaAPI.Controllers.V1
 {
     [ApiController]
     [Route("api/v1/usuarios")]
+    [DeshabilitarLimitarPeticionesAttribute]
     public class UsuariosController : ControllerBase
     {
         private readonly UserManager<Usuario> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<Usuario> signInManager;
-        private readonly IServicioUsuario servicioUsuario;
+        private readonly IServiciosUsuarios servicioUsuario;
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
+        private readonly IServicioLlaves servicioLlaves;
 
         /// <summary>
         /// controlador para
@@ -31,8 +34,9 @@ namespace BibliotecaAPI.Controllers.V1
         /// <param name="userManager">necesario para crear usuario, IdentityUser clse de usuario de autentificacion</param>
         /// <param name="configuration">IConfiguration para otener valores de un proveedor de configuracion </param>
         public UsuariosController(UserManager<Usuario> userManager, IConfiguration configuration
-                , SignInManager<Usuario> signInManager, IServicioUsuario servicioUsuario, 
-            ApplicationDbContext context, IMapper mapper)
+                , SignInManager<Usuario> signInManager, IServiciosUsuarios servicioUsuario, 
+            ApplicationDbContext context, IMapper mapper
+            ,IServicioLlaves servicioLlaves)
         {
             this.userManager = userManager;
             this.configuration = configuration;
@@ -40,6 +44,7 @@ namespace BibliotecaAPI.Controllers.V1
             this.servicioUsuario = servicioUsuario;
             this.context = context;
             this.mapper = mapper;
+            this.servicioLlaves = servicioLlaves;
         }
 
         [HttpGet(Name = "ObtenerUsuariosV1")]
@@ -65,7 +70,7 @@ namespace BibliotecaAPI.Controllers.V1
 
             if (resultado.Succeeded)
             {
-                return await ConstruirToken(credencialesUsuarioDTO);
+                return await ConstruirToken(credencialesUsuarioDTO, usuario.Id);
             }
             else
             {
@@ -90,7 +95,7 @@ namespace BibliotecaAPI.Controllers.V1
 
             var credencialesUsuarioDTO = new CredencialesUsuarioDTO { Email = usuario.Email! };
 
-            var respuestaAutenticacion = await ConstruirToken(credencialesUsuarioDTO);
+            var respuestaAutenticacion = await ConstruirToken(credencialesUsuarioDTO, usuario.Id);
 
             return respuestaAutenticacion;
         }
@@ -148,7 +153,8 @@ namespace BibliotecaAPI.Controllers.V1
             var resultado = await userManager.CreateAsync(usuario, credencialesUsuarioDTO.Password!);
             if (resultado.Succeeded)
             {
-                var respuestaAutenticacion = await ConstruirToken(credencialesUsuarioDTO);
+                var respuestaAutenticacion = await ConstruirToken(credencialesUsuarioDTO, usuario.Id);
+                await servicioLlaves.CrearLlave(usuario.Id, TipoLlave.Gratuita);//
                 return respuestaAutenticacion;
             }
             else
@@ -160,12 +166,15 @@ namespace BibliotecaAPI.Controllers.V1
                 return ValidationProblem();
             }
         }
-        private async Task<RespuestaAutenticacionDTO> ConstruirToken(CredencialesUsuarioDTO credencialesUsuarioDTO)
+        private async Task<RespuestaAutenticacionDTO> ConstruirToken(
+            CredencialesUsuarioDTO credencialesUsuarioDTO
+            , string usuarioId)
         {
             var claims = new List<Claim>
             {
                 new Claim("email",credencialesUsuarioDTO.Email),
-                new Claim("loqueyoquiera","Cualqueirvalor")
+                new Claim("loqueyoquiera","Cualqueirvalor"),
+                new Claim("usuarioId",usuarioId)
             };
             var usuario = await userManager.FindByEmailAsync(credencialesUsuarioDTO.Email);
             var claimDB = await userManager.GetClaimsAsync(usuario!);

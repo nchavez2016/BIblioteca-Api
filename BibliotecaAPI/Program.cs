@@ -14,7 +14,9 @@ using BibliotecaAPI.Swagger;
 using BibliotecaAPI.Utilidades;
 using Microsoft.AspNetCore.Diagnostics;
 using StackExchange.Redis;
-using BibliotecaAPI.Utilidades.V1; // Para OpenApiSecurityScheme, OpenApiSecurityRequirement
+using BibliotecaAPI.Utilidades.V1;
+using BibliotecaAPI.DTOs;
+using BibliotecaAPI.Jobs; // Para OpenApiSecurityScheme, OpenApiSecurityRequirement
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,8 +81,12 @@ builder.Services.AddScoped<BibliotecaAPI.Servicios.V1.IGeneradorEnlaces, Bibliot
 builder.Services.AddScoped<HATEOASAutorAttribute>();
 builder.Services.AddScoped<HATEOASAutoresAttribute>();
 
+builder.Services.AddHostedService<FacturasBackgroundService>();
 
-builder.Services.AddTransient<IServicioUsuario, ServicioUsuario>();//para obtener el id de usario de manera segura
+builder.Services.AddScoped<IServicioLlaves, ServicioLlaves>();
+
+
+builder.Services.AddTransient<IServiciosUsuarios, ServicioUsuario>();//para obtener el id de usario de manera segura
 builder.Services.AddTransient<IAlmacenadorArchivos, AlmacenadorArchivosLocal>();//servicio para almacenar archivo de manera local
 builder.Services.AddHttpContextAccessor();//para poder usar en AlmacenadorArchivosLocal la injection IHttpContextAccessor
 
@@ -217,6 +223,11 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(opciones => opciones.UseSqlServer("name=DefaultConnection"));
 
 
+builder.Services.AddOptions<LimitarPeticionesDTO>()
+    .Bind(builder.Configuration.GetSection(LimitarPeticionesDTO.seccion))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 var app = builder.Build();
 
 
@@ -266,6 +277,8 @@ app.UseSwaggerUI(opciones => //permite visualizar swagger agrupado por version (
 
 app.UseStaticFiles();//para servir a archivos estaticos de wwwroot que es en donde se guraga las imagenes
 app.UseCors();
+
+app.UseLimitarPeticiones();//importante la ubicacion para el limte de uso de la api
 
 app.UseOutputCache();//necesario para manejara cache 
 

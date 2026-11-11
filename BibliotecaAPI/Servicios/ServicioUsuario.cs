@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BibliotecaAPI.Servicios
 {
-    public class ServicioUsuario : IServicioUsuario //(se crea interfas para usar  el prinicpio de inyeccion dependencia para depender de objetos abstractos y no objetos conretos )
+    public class ServicioUsuario : IServiciosUsuarios //(se crea interfas para usar  el prinicpio de inyeccion dependencia para depender de objetos abstractos y no objetos conretos )
     {
         private readonly UserManager<Usuario> userManager;
         private readonly IHttpContextAccessor contextAccessor;
@@ -27,6 +27,18 @@ namespace BibliotecaAPI.Servicios
             return await userManager.FindByEmailAsync(email);
 
         }
+        public string? ObtenerUsuarioId()
+        {
+            var idClaim = contextAccessor.HttpContext!
+                        .User.Claims.Where(x => x.Type == "usuarioId").FirstOrDefault();
+            if (idClaim is null)
+            {
+                return null;
+            }
+            var id = idClaim.Value;
+            return id;
+        }
+
 
     }
 }

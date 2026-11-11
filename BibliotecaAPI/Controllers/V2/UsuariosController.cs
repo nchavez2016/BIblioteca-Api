@@ -21,7 +21,7 @@ namespace BibliotecaAPI.Controllers.V2
         private readonly UserManager<Usuario> userManager;
         private readonly IConfiguration configuration;
         private readonly SignInManager<Usuario> signInManager;
-        private readonly IServicioUsuario servicioUsuario;
+        private readonly IServiciosUsuarios servicioUsuario;
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
 
@@ -31,7 +31,7 @@ namespace BibliotecaAPI.Controllers.V2
         /// <param name="userManager">necesario para crear usuario, IdentityUser clse de usuario de autentificacion</param>
         /// <param name="configuration">IConfiguration para otener valores de un proveedor de configuracion </param>
         public UsuariosController(UserManager<Usuario> userManager, IConfiguration configuration
-                , SignInManager<Usuario> signInManager, IServicioUsuario servicioUsuario, 
+                , SignInManager<Usuario> signInManager, IServiciosUsuarios servicioUsuario, 
             ApplicationDbContext context, IMapper mapper)
         {
             this.userManager = userManager;

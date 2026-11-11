@@ -24,6 +24,15 @@ namespace BibliotecaAPI.Datos
 
         public DbSet<Error> Errores { get; set; }
 
+        public DbSet<LlaveAPI> LlavesApi { get; set; }
+        public DbSet<Peticion> Peticiones { get; set; }
+        public DbSet<RestriccionDominio> RestriccionesDominio { get; set; }
+        public DbSet<RestriccionIP> RestriccionesIP { get; set; }
+
+        public DbSet<Factura> Facturas { get; set; }
+        public DbSet<FacturaEmitida> FacturasEmitidas { get; set; }
+
+
 
     }
 }

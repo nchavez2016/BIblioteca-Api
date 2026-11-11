@@ -20,13 +20,13 @@ namespace BibliotecaAPI.Controllers.V1
     {
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
-        private readonly IServicioUsuario servicioUsuario;
+        private readonly IServiciosUsuarios servicioUsuario;
         private readonly IOutputCacheStore outputCacheStore;
         private const string cache = "Comentarios-obtener";
 
         public ComentariosController(ApplicationDbContext context
                                     , IMapper mapper
-                                    , IServicioUsuario servicioUsuario
+                                    , IServiciosUsuarios servicioUsuario
                                     , IOutputCacheStore outputCacheStore //inyectar el limpiado de cache
                                      )
         {
